@@ -51,6 +51,12 @@ impl App {
         let mut session_picker = SessionPicker::new();
         session_picker.refresh()?;
 
+        // Initialize component based on initial view
+        let command_palette = match &initial_view {
+            View::CommandPalette => Some(CommandPalette::new(&current_path)),
+            _ => None,
+        };
+
         Ok(Self {
             tui: Tui::new()?,
             event_handler: EventHandler::new(100),
@@ -59,7 +65,7 @@ impl App {
             running: true,
             current_path,
             session_picker,
-            command_palette: None,
+            command_palette,
             file_picker: None,
             worktree_picker: None,
             tmux,
