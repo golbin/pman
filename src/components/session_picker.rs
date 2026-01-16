@@ -97,7 +97,7 @@ impl Component for SessionPicker {
                     self.fuzzy_list.clear_query();
                     Ok(Some(Action::Render))
                 } else {
-                    Ok(Some(Action::Quit))
+                    Ok(Some(Action::GoBack))
                 }
             }
             _ => Ok(None),
@@ -109,6 +109,6 @@ impl Component for SessionPicker {
     }
 
     fn help_text(&self) -> &'static str {
-        "Enter:switch  n:new  d:delete  Esc:quit"
+        "Enter:switch  n:new  d:delete  Esc:back"
     }
 }

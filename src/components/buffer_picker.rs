@@ -103,7 +103,7 @@ impl Component for BufferPicker {
                     self.fuzzy_list.clear_query();
                     Ok(Some(Action::Render))
                 } else {
-                    Ok(Some(Action::Quit))
+                    Ok(Some(Action::GoBack))
                 }
             }
             _ => Ok(None),
@@ -115,6 +115,6 @@ impl Component for BufferPicker {
     }
 
     fn help_text(&self) -> &'static str {
-        "Enter:open  Esc:quit"
+        "Enter:open  Esc:back"
     }
 }

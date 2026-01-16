@@ -132,7 +132,7 @@ impl Component for WorktreePicker {
                     self.fuzzy_list.clear_query();
                     Ok(Some(Action::Render))
                 } else {
-                    Ok(Some(Action::Quit))
+                    Ok(Some(Action::GoBack))
                 }
             }
             _ => Ok(None),
@@ -144,6 +144,6 @@ impl Component for WorktreePicker {
     }
 
     fn help_text(&self) -> &'static str {
-        "Enter:switch  n:new  d:delete  m:merge  Esc:quit"
+        "Enter:switch  n:new  d:delete  m:merge  Esc:back"
     }
 }

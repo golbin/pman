@@ -157,7 +157,7 @@ impl Component for FilePicker {
                     self.fuzzy_list.clear_query();
                     Ok(Some(Action::Render))
                 } else {
-                    Ok(Some(Action::Quit))
+                    Ok(Some(Action::GoBack))
                 }
             }
             _ => Ok(None),
@@ -169,6 +169,6 @@ impl Component for FilePicker {
     }
 
     fn help_text(&self) -> &'static str {
-        "Enter:open/navigate  Esc:quit"
+        "Enter:open/navigate  Esc:back"
     }
 }

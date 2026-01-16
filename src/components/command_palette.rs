@@ -84,7 +84,7 @@ impl Component for CommandPalette {
                     self.fuzzy_list.clear_query();
                     Ok(Some(Action::Render))
                 } else {
-                    Ok(Some(Action::Quit))
+                    Ok(Some(Action::GoBack))
                 }
             }
             _ => Ok(None),
@@ -96,6 +96,6 @@ impl Component for CommandPalette {
     }
 
     fn help_text(&self) -> &'static str {
-        "Enter:execute  Esc:quit"
+        "Enter:execute  Esc:back"
     }
 }

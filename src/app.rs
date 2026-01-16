@@ -12,6 +12,7 @@ use crate::integrations::{GitClient, NvimIntegration, TmuxClient};
 use crate::models::PaletteCommand;
 use crate::tui::{key_to_action, Event, EventHandler, Tui};
 
+#[derive(Clone, Copy, PartialEq)]
 pub enum View {
     SessionPicker,
     CommandPalette,
@@ -30,6 +31,7 @@ pub struct App {
     tui: Tui,
     event_handler: EventHandler,
     view: View,
+    view_history: Vec<View>,
     dialog: Dialog,
     running: bool,
     current_path: PathBuf,
@@ -68,6 +70,7 @@ impl App {
             tui: Tui::new()?,
             event_handler: EventHandler::new(100),
             view: initial_view,
+            view_history: Vec::new(),
             dialog: Dialog::None,
             running: true,
             current_path,
@@ -220,6 +223,14 @@ impl App {
                 self.running = false;
                 return Ok(());
             }
+            Action::GoBack => {
+                if let Some(prev_view) = self.view_history.pop() {
+                    self.view = prev_view;
+                } else {
+                    self.running = false;
+                }
+                return Ok(());
+            }
             Action::CloseDialog => {
                 self.dialog = Dialog::None;
                 return Ok(());
@@ -328,11 +339,17 @@ impl App {
                 return self.execute_command(cmd);
             }
             Action::ShowSessionPicker => {
+                if self.view != View::SessionPicker {
+                    self.view_history.push(self.view);
+                }
                 self.view = View::SessionPicker;
                 self.session_picker.refresh()?;
                 return Ok(());
             }
             Action::ShowCommandPalette => {
+                if self.view != View::CommandPalette {
+                    self.view_history.push(self.view);
+                }
                 self.view = View::CommandPalette;
                 if self.command_palette.is_none() {
                     self.command_palette = Some(CommandPalette::new(&self.current_path));
@@ -340,6 +357,9 @@ impl App {
                 return Ok(());
             }
             Action::ShowFilePicker => {
+                if self.view != View::FilePicker {
+                    self.view_history.push(self.view);
+                }
                 self.view = View::FilePicker;
                 if self.file_picker.is_none() {
                     self.file_picker = Some(FilePicker::new(&self.current_path));
@@ -347,6 +367,9 @@ impl App {
                 return Ok(());
             }
             Action::ShowWorktreePicker => {
+                if self.view != View::WorktreePicker {
+                    self.view_history.push(self.view);
+                }
                 self.view = View::WorktreePicker;
                 if self.worktree_picker.is_none() {
                     self.worktree_picker = Some(WorktreePicker::new(&self.current_path));
@@ -354,6 +377,9 @@ impl App {
                 return Ok(());
             }
             Action::ShowBufferPicker => {
+                if self.view != View::BufferPicker {
+                    self.view_history.push(self.view);
+                }
                 self.view = View::BufferPicker;
                 self.buffer_picker = Some(BufferPicker::new());
                 return Ok(());
@@ -408,6 +434,9 @@ impl App {
         match cmd {
             // Sessions
             PaletteCommand::ListSessions => {
+                if self.view != View::SessionPicker {
+                    self.view_history.push(self.view);
+                }
                 self.view = View::SessionPicker;
                 self.session_picker.refresh()?;
             }
@@ -427,6 +456,9 @@ impl App {
             }
             // Worktrees
             PaletteCommand::ListWorktrees => {
+                if self.view != View::WorktreePicker {
+                    self.view_history.push(self.view);
+                }
                 self.view = View::WorktreePicker;
                 if self.worktree_picker.is_none() {
                     self.worktree_picker = Some(WorktreePicker::new(&self.current_path));
@@ -441,12 +473,15 @@ impl App {
             // Files
             PaletteCommand::FindFiles => {
                 self.tui.exit()?;
-                let cmd = r#"file=$(fd --type f --hidden --exclude .git | fzf --preview 'bat --color=always --style=numbers --line-range=:500 {}') && [ -n "$file" ] && nvim "$file""#;
+                let cmd = r#"sh -c 'file=$(fd --type f --hidden --exclude .git | fzf --preview "bat --color=always --style=numbers --line-range=:500 {}") && [ -n "$file" ] && nvim "$file"'"#;
                 self.tmux.popup_command(cmd, "90%", "90%")?;
                 self.running = false;
                 return Ok(());
             }
             PaletteCommand::ListBuffers => {
+                if self.view != View::BufferPicker {
+                    self.view_history.push(self.view);
+                }
                 self.view = View::BufferPicker;
                 self.buffer_picker = Some(BufferPicker::new());
             }

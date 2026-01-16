@@ -4,6 +4,7 @@ use crate::models::PaletteCommand;
 #[derive(Debug, Clone)]
 pub enum Action {
     Quit,
+    GoBack,
     Render,
 
     // Navigation
