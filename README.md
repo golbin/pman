@@ -1,24 +1,26 @@
 # pman
 
-**Run 10 AI coding agents in parallel. Switch between them in 2 keystrokes.**
+**Run multiple AI agents in parallel. Switch between them in 2 keystrokes.**
 
-Claude Code, Codex, Cursor, Aider... AI agents are powerful, but slow. Why wait for one when you can run ten? pman turns tmux into a multi-agent cockpit—spawn agents in separate sessions, give each its own git worktree, and jump between them instantly with fuzzy search.
+Claude Code, Codex, Aider... AI agents are powerful, but slow. Why wait for one when you can run several? pman lets you manage multiple tmux sessions and git worktrees with fuzzy search—perfect for running AI agents in parallel without conflicts.
 
 ```
-Session 1: Claude implementing auth      [████████░░] 80%
-Session 2: Codex writing tests           [██████░░░░] 60%
-Session 3: Claude refactoring API        [████░░░░░░] 40%
-Session 4: Aider fixing bugs             [██░░░░░░░░] 20%
-
-> Press Prefix+s to switch... _
+┌ Sessions ─────────────────────────────┐
+│ > _                                   │
+└───────────────────────────────────────┘
+┌───────────────────────────────────────┐
+│ ▶ ● claude-auth (myproject)           │
+│   ○ codex-tests (myproject)           │
+│   ○ aider-refactor (myproject)        │
+│   ○ manual-review (myproject)         │
+└───────────────────────────────────────┘
 ```
 
 ## Why pman?
 
-- **Parallel Execution** - Run multiple AI agents simultaneously, each in its own tmux session
-- **Isolated Workspaces** - Each agent gets its own git worktree, no merge conflicts
-- **Instant Context Switch** - Fuzzy search across all sessions, switch in milliseconds
-- **Zero Overhead** - Lightweight TUI, no electron, no bloat
+- **Parallel Agents** - Run multiple AI coding agents, each in its own tmux session
+- **Isolated Worktrees** - Each agent works on a separate git branch, no conflicts
+- **Instant Switch** - Fuzzy search and jump between sessions in milliseconds
 
 ## Installation
 
@@ -29,71 +31,59 @@ brew install golbin/tap/pman
 ## Quick Start
 
 ```bash
-# 1. Install tmux keybindings
+# 1. Install keybindings
 pman install && tmux source-file ~/.tmux.conf
 
-# 2. Inside tmux, press Prefix+s (usually Ctrl+b, then s)
-#    to open session picker and start switching!
+# 2. Inside tmux, press Prefix+s to open session picker
+#    (Prefix is usually Ctrl+b)
 ```
 
 ## Usage Scenarios
 
-### Scenario 1: Parallel Feature Development
+### Scenario 1: Multiple Agents on Separate Features
 
-You have 3 features to implement. Instead of doing them sequentially:
+Give each AI agent its own worktree to avoid conflicts:
 
 ```bash
-# Create worktrees for each feature
-# (Use Prefix+p → Create Worktree)
-feature/auth
-feature/payment
-feature/notifications
+# Create worktrees (Prefix+p → List Worktrees → n)
+# Each worktree = separate branch
 
-# Spawn Claude Code in each worktree
-tmux new-session -s auth -c ~/project-auth
-tmux new-session -s payment -c ~/project-payment
-tmux new-session -s notifications -c ~/project-notifications
+┌ Worktrees ────────────────────────────┐
+│ > _                                   │
+└───────────────────────────────────────┘
+┌───────────────────────────────────────┐
+│ ▶ feature/auth (a1b2c3d)              │
+│   feature/payment* (e4f5g6h)          │
+│   feature/notifications (i9j0k1l)     │
+│   main (m2n3o4p) [main]               │
+└───────────────────────────────────────┘
 
-# Now run your AI agent in each session
-# Switch between them with Prefix+s to monitor progress
+# Start agents in separate sessions:
+# Session 1: Claude Code → feature/auth
+# Session 2: Codex → feature/payment
+# Session 3: Aider → feature/notifications
+
+# Use Prefix+s to monitor each agent's progress
+# Merge completed branches with 'm' key
 ```
 
-### Scenario 2: Agent A/B Testing
+### Scenario 2: Review While Agents Work
 
-Compare how different agents solve the same problem:
-
-```bash
-# Session: claude-refactor    → Claude Code refactoring your API
-# Session: codex-refactor     → Codex doing the same task
-# Session: aider-refactor     → Aider's approach
-
-# Use Prefix+s to rapidly compare outputs
-# Pick the best solution, discard the rest
-```
-
-### Scenario 3: Review While Agents Work
+Work in parallel with your AI agents:
 
 ```bash
-# Session: agent-working      → AI implementing feature
-# Session: review             → You reviewing previous AI output
-# Session: manual-fixes       → You fixing edge cases AI missed
+┌ Sessions ─────────────────────────────┐
+│ > rev                                 │
+└───────────────────────────────────────┘
+┌───────────────────────────────────────┐
+│ ▶ ○ review (myproject)                │
+└───────────────────────────────────────┘
+
+# Session: agent-impl    → AI implementing feature (attached ●)
+# Session: review        → You reviewing code
+# Session: hotfix        → You fixing urgent bugs
 
 # Agents don't block you. You don't block agents.
-# True parallel workflow.
-```
-
-### Scenario 4: Large Codebase Refactoring
-
-Split a massive refactoring task across multiple agents:
-
-```bash
-# Session: refactor-models    → Agent refactoring data models
-# Session: refactor-api       → Agent updating API endpoints
-# Session: refactor-tests     → Agent fixing broken tests
-# Session: refactor-docs      → Agent updating documentation
-
-# Each agent works on a separate worktree
-# Merge when all complete
 ```
 
 ## Keybindings
@@ -115,32 +105,23 @@ Split a massive refactoring task across multiple agents:
 | `d` | Delete session |
 | `Esc` | Close |
 
-### Command Palette
-
-Available commands:
-- **Open File** - Open file in nvim
-- **New Session** - Create tmux session
-- **Kill Session** - Kill current session
-- **List Worktrees** - Manage git worktrees
-- **Create Worktree** - Create new worktree
-- **Git Status** - Show git diff
-
 ### Worktree Picker
 
 | Key | Action |
 |-----|--------|
+| Type | Fuzzy search |
 | `Enter` | Switch to worktree |
 | `n` | New worktree |
 | `d` | Delete worktree |
 | `m` | Merge to main |
+| `Esc` | Close |
 
 ### Navigation (All Views)
 
 | Key | Action |
 |-----|--------|
-| `Ctrl+k` / `Up` | Move up |
-| `Ctrl+j` / `Down` | Move down |
-| `PageUp` / `PageDown` | Page navigation |
+| `Ctrl+k` / `↑` | Move up |
+| `Ctrl+j` / `↓` | Move down |
 
 ## Prerequisites
 
@@ -151,8 +132,7 @@ brew install tmux neovim git-delta
 ## Uninstall
 
 ```bash
-pman uninstall
-tmux source-file ~/.tmux.conf
+pman uninstall && tmux source-file ~/.tmux.conf
 brew uninstall pman
 ```
 
